@@ -134,7 +134,7 @@ Could a human have built this? Sure. Would it have taken 10x longer with 10x mor
 
 ## 📜 License
 
-Do whatever you want with this. It's a leaderboard tracker, not a nuclear launch system. Dota is by community for community, proprietary is 2k dog
+Do whatever you want with this. It's a leaderboard tracker, not a nuclear launch system. Dota is (was?) by community for community. Glory to Icefrog
 
 ---
 
