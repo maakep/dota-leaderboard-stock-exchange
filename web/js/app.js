@@ -18,10 +18,26 @@ const App = {
       // Initialize modules
       this.initModules();
 
-      // Render initial state
-      this.renderStats();
+      // Load saved scope preferences
+      const savedWinnersScope = localStorage.getItem("winnersScope") || "20";
+      const savedLosersScope = localStorage.getItem("losersScope") || "20";
+      const savedTimeScope = localStorage.getItem("timeScope") || "0";
+
+      // Set dropdown values from saved preferences
+      document.getElementById("winners-scope").value = savedWinnersScope;
+      document.getElementById("losers-scope").value = savedLosersScope;
+      document.getElementById("time-scope").value = savedTimeScope;
+      document.getElementById("time-scope-losers").value = savedTimeScope;
+
+      // Render initial state with saved scopes
+      this.renderStats(
+        parseInt(savedWinnersScope),
+        parseInt(savedLosersScope),
+        parseInt(savedTimeScope)
+      );
       this.renderInitialLeaderboard();
       this.setupScopeFilters();
+      this.setupExpandToggle();
 
       // Hide loading, show content
       document.getElementById("loading").classList.add("hidden");
@@ -89,9 +105,21 @@ const App = {
   /**
    * Render statistics cards
    */
-  renderStats(winnersScope = 500, losersScope = 500) {
-    const winners = Stats.getWinners(this.playerHistory, 5, winnersScope);
-    const losers = Stats.getLosers(this.playerHistory, 5, losersScope);
+  renderStats(winnersScope = 500, losersScope = 500, timeDays = 0) {
+    const winners = Stats.getWinners(
+      this.playerHistory,
+      5,
+      winnersScope,
+      timeDays,
+      this.data.snapshots
+    );
+    const losers = Stats.getLosers(
+      this.playerHistory,
+      5,
+      losersScope,
+      timeDays,
+      this.data.snapshots
+    );
 
     // Render winners
     const winnersList = document.getElementById("winners-list");
@@ -166,17 +194,64 @@ const App = {
   setupScopeFilters() {
     const winnersSelect = document.getElementById("winners-scope");
     const losersSelect = document.getElementById("losers-scope");
+    const timeSelect = document.getElementById("time-scope");
+    const timeSelectLosers = document.getElementById("time-scope-losers");
+
+    const getScopes = () => ({
+      winners: parseInt(winnersSelect.value),
+      losers: parseInt(losersSelect.value),
+      time: parseInt(timeSelect.value),
+    });
 
     winnersSelect.addEventListener("change", () => {
-      const scope = parseInt(winnersSelect.value);
-      const losersScope = parseInt(losersSelect.value);
-      this.renderStats(scope, losersScope);
+      const scopes = getScopes();
+      localStorage.setItem("winnersScope", winnersSelect.value);
+      this.renderStats(scopes.winners, scopes.losers, scopes.time);
     });
 
     losersSelect.addEventListener("change", () => {
-      const winnersScope = parseInt(winnersSelect.value);
-      const scope = parseInt(losersSelect.value);
-      this.renderStats(winnersScope, scope);
+      const scopes = getScopes();
+      localStorage.setItem("losersScope", losersSelect.value);
+      this.renderStats(scopes.winners, scopes.losers, scopes.time);
+    });
+
+    timeSelect.addEventListener("change", () => {
+      timeSelectLosers.value = timeSelect.value; // Sync losers dropdown
+      const scopes = getScopes();
+      localStorage.setItem("timeScope", timeSelect.value);
+      this.renderStats(scopes.winners, scopes.losers, scopes.time);
+    });
+
+    timeSelectLosers.addEventListener("change", () => {
+      timeSelect.value = timeSelectLosers.value; // Sync winners dropdown
+      const scopes = getScopes();
+      localStorage.setItem("timeScope", timeSelectLosers.value);
+      this.renderStats(scopes.winners, scopes.losers, scopes.time);
+    });
+  },
+
+  /**
+   * Setup expand/compact toggle for leaderboard
+   */
+  setupExpandToggle() {
+    const toggle = document.getElementById("expand-toggle");
+    const app = document.querySelector(".app");
+
+    // Load saved preference
+    const isCompact = localStorage.getItem("compactMode") === "true";
+    if (isCompact) {
+      app.classList.add("compact");
+      toggle.textContent = "↙";
+      toggle.title = "Show header and stats";
+    }
+
+    toggle.addEventListener("click", () => {
+      const isNowCompact = app.classList.toggle("compact");
+      toggle.textContent = isNowCompact ? "↙" : "↗";
+      toggle.title = isNowCompact
+        ? "Show header and stats"
+        : "Toggle compact mode";
+      localStorage.setItem("compactMode", isNowCompact);
     });
   },
 

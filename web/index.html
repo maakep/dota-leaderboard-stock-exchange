@@ -11,7 +11,7 @@
 <body>
   <div class="app">
     <!-- Header -->
-    <header class="header">
+    <header class="header" id="app-header">
       <h1>🏆 Dota 2 Leaderboard Time Machine</h1>
       <p class="subtitle">Europe Region</p>
     </header>
@@ -30,39 +30,54 @@
     <!-- Main Content -->
     <main id="main-content" class="main-content hidden">
       <!-- Stats Cards -->
-      <section class="stats-section">
+      <section class="stats-section" id="stats-section">
         <div class="stats-card winners" id="winners-card">
           <h2>
             <span>📈 Biggest Winners</span>
-            <select id="winners-scope" class="scope-select">
-              <option value="500">All</option>
-              <option value="200">Top 200</option>
-              <option value="100">Top 100</option>
-              <option value="50">Top 50</option>
-              <option value="10">Top 10</option>
-            </select>
+            <div class="scope-selects">
+              <select id="time-scope" class="scope-select">
+                <option value="1">Today</option>
+                <option value="7">Last Week</option>
+                <option value="30">Last Month</option>
+                <option value="180">Last 6 Months</option>
+                <option value="0">Forever</option>
+              </select>
+              <select id="winners-scope" class="scope-select">
+                <option value="10">Top 10</option>
+                <option value="20">Top 20</option>
+                <option value="50">Top 50</option>
+                <option value="100">Top 100</option>
+                <option value="200">Top 200</option>
+                <option value="500">Top 500</option>
+              </select>
+            </div>
           </h2>
           <ul id="winners-list" class="stats-list"></ul>
         </div>
         <div class="stats-card losers" id="losers-card">
           <h2>
             <span>📉 Biggest Losers</span>
-            <select id="losers-scope" class="scope-select">
-              <option value="500">All</option>
-              <option value="200">Top 200</option>
-              <option value="100">Top 100</option>
-              <option value="50">Top 50</option>
-              <option value="10">Top 10</option>
-            </select>
+            <div class="scope-selects">
+              <select id="time-scope-losers" class="scope-select">
+                <option value="1">Today</option>
+                <option value="7">Last Week</option>
+                <option value="30">Last Month</option>
+                <option value="180">Last 6 Months</option>
+                <option value="0">Forever</option>
+              </select>
+              <select id="losers-scope" class="scope-select">
+                <option value="10">Top 10</option>
+                <option value="20">Top 20</option>
+                <option value="50">Top 50</option>
+                <option value="100">Top 100</option>
+                <option value="200">Top 200</option>
+                <option value="500">Top 500</option>
+              </select>
+            </div>
           </h2>
           <ul id="losers-list" class="stats-list"></ul>
         </div>
       </section>
-
-      <!-- Current Time Display -->
-      <div class="time-display">
-        <span id="current-time">Loading...</span>
-      </div>
 
       <!-- Leaderboard -->
       <section class="leaderboard-section">
@@ -72,6 +87,7 @@
           <span class="col-team">Team</span>
           <span class="col-name">Player</span>
           <span class="col-arrow"></span>
+          <button id="expand-toggle" class="expand-toggle" title="Toggle compact mode">↗</button>
         </div>
         <div id="leaderboard" class="leaderboard"></div>
       </section>
@@ -85,6 +101,7 @@
             <button class="speed-btn active" data-speed="2">2x</button>
             <button class="speed-btn" data-speed="5">5x</button>
           </div>
+          <span id="current-time" class="current-time">Loading...</span>
         </div>
         <div class="timeline-slider-container">
           <input type="range" id="timeline-slider" class="timeline-slider" min="0" max="100" value="100">

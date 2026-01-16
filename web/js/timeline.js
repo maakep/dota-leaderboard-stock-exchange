@@ -160,9 +160,9 @@ const Timeline = {
   updateTimeDisplay() {
     const snapshot = this.snapshots[this.currentIndex];
     if (snapshot) {
-      this.currentTimeDisplay.textContent = `Showing: ${this.formatDateTime(
+      this.currentTimeDisplay.textContent = this.formatDateTime(
         snapshot.timestamp
-      )}`;
+      );
     }
   },
 
@@ -182,14 +182,14 @@ const Timeline = {
    */
   formatDateTime(isoString) {
     const date = new Date(isoString);
-    return date.toLocaleDateString("en-US", {
+    const month = date.toLocaleDateString("en-US", {
       month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      timeZoneName: "short",
+      timeZone: "UTC",
     });
+    const day = date.getUTCDate();
+    const hours = date.getUTCHours().toString().padStart(2, "0");
+    const minutes = date.getUTCMinutes().toString().padStart(2, "0");
+    return `${month} ${day} - ${hours}:${minutes} UTC`;
   },
 
   /**

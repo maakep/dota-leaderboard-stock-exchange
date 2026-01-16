@@ -102,6 +102,11 @@ body {
   flex-shrink: 0;
 }
 
+.scope-selects {
+  display: flex;
+  gap: 8px;
+}
+
 .stats-card {
   background: var(--bg-secondary);
   border-radius: 12px;
@@ -141,6 +146,7 @@ body {
 .stats-list {
   list-style: none;
   overflow-y: auto;
+  overflow-x: hidden;
   flex: 1;
   min-height: 0;
 }
@@ -153,9 +159,6 @@ body {
   border-bottom: 1px solid var(--border-color);
   cursor: pointer;
   transition: background 0.2s;
-  margin: 0 -10px;
-  padding-left: 10px;
-  padding-right: 10px;
   border-radius: 6px;
 }
 
@@ -226,18 +229,6 @@ body {
   overflow: hidden;
 }
 
-/* Time Display */
-.time-display {
-  text-align: center;
-  padding: 10px;
-  background: var(--bg-secondary);
-  border-radius: 8px;
-  margin-bottom: 10px;
-  font-size: 1rem;
-  border: 1px solid var(--border-color);
-  flex-shrink: 0;
-}
-
 /* Leaderboard */
 .leaderboard-section {
   background: var(--bg-secondary);
@@ -252,7 +243,7 @@ body {
 
 .leaderboard-header {
   display: grid;
-  grid-template-columns: 70px 60px 100px 1fr 40px;
+  grid-template-columns: 70px 60px 100px 1fr 40px 40px;
   padding: 15px 20px;
   background: var(--bg-tertiary);
   font-weight: 600;
@@ -376,6 +367,58 @@ body {
   align-items: center;
   gap: 15px;
   margin-bottom: 10px;
+}
+
+.current-time {
+  margin-left: auto;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.expand-toggle {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.2s, background 0.2s;
+  justify-self: end;
+}
+
+.expand-toggle:hover {
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+}
+
+/* Compact mode - hide header and stats */
+.header,
+.stats-section {
+  transition: opacity 0.3s ease, max-height 0.3s ease, margin 0.3s ease, padding 0.3s ease;
+  overflow: hidden;
+}
+
+.app.compact .header,
+.app.compact .stats-section {
+  opacity: 0;
+  max-height: 0;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+}
+
+.header {
+  max-height: 100px;
+}
+
+.stats-section {
+  max-height: 400px;
+}
+
+.app.compact .leaderboard-section {
+  margin-top: 0;
 }
 
 .control-btn {

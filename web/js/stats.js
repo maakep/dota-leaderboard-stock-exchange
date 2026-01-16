@@ -5,13 +5,30 @@
 
 const Stats = {
   /**
+   * Filter snapshots to only include those within a time period
+   * @param {Array} snapshots - All snapshots
+   * @param {number} days - Number of days to include (0 = all time)
+   */
+  filterSnapshotsByTime(snapshots, days) {
+    if (days === 0 || !snapshots.length) return snapshots;
+
+    const now = new Date();
+    const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+
+    return snapshots.filter((s) => new Date(s.timestamp) >= cutoff);
+  },
+
+  /**
    * Build a map of player history across all snapshots
    * Returns: { playerName: [{ timestamp, rank }, ...] }
+   * @param {Array} snapshots - Snapshots to process
+   * @param {number} timeDays - Number of days to include (0 = all time)
    */
-  buildPlayerHistory(snapshots) {
+  buildPlayerHistory(snapshots, timeDays = 0) {
+    const filteredSnapshots = this.filterSnapshotsByTime(snapshots, timeDays);
     const history = {};
 
-    for (const snapshot of snapshots) {
+    for (const snapshot of filteredSnapshots) {
       for (const player of snapshot.players) {
         if (!history[player.name]) {
           history[player.name] = {
@@ -43,11 +60,24 @@ const Stats = {
    * @param {Object} playerHistory - Player history data
    * @param {number} count - Number of results to return
    * @param {number} scope - Only include players whose current rank is within this scope
+   * @param {number} timeDays - Time period in days (0 = all time)
+   * @param {Array} snapshots - Original snapshots for time filtering
    */
-  getWinners(playerHistory, count = 5, scope = 500) {
+  getWinners(
+    playerHistory,
+    count = 5,
+    scope = 500,
+    timeDays = 0,
+    snapshots = null
+  ) {
+    // If time filter is specified, rebuild history with filtered snapshots
+    const history =
+      timeDays > 0 && snapshots
+        ? this.buildPlayerHistory(snapshots, timeDays)
+        : playerHistory;
     const changes = [];
 
-    for (const [name, data] of Object.entries(playerHistory)) {
+    for (const [name, data] of Object.entries(history)) {
       if (data.ranks.length < 2) continue;
 
       const firstRank = data.ranks[0].rank;
@@ -77,11 +107,24 @@ const Stats = {
    * @param {Object} playerHistory - Player history data
    * @param {number} count - Number of results to return
    * @param {number} scope - Only include players whose current rank is within this scope
+   * @param {number} timeDays - Time period in days (0 = all time)
+   * @param {Array} snapshots - Original snapshots for time filtering
    */
-  getLosers(playerHistory, count = 5, scope = 500) {
+  getLosers(
+    playerHistory,
+    count = 5,
+    scope = 500,
+    timeDays = 0,
+    snapshots = null
+  ) {
+    // If time filter is specified, rebuild history with filtered snapshots
+    const history =
+      timeDays > 0 && snapshots
+        ? this.buildPlayerHistory(snapshots, timeDays)
+        : playerHistory;
     const changes = [];
 
-    for (const [name, data] of Object.entries(playerHistory)) {
+    for (const [name, data] of Object.entries(history)) {
       if (data.ranks.length < 2) continue;
 
       const firstRank = data.ranks[0].rank;
