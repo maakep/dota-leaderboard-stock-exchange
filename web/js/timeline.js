@@ -56,6 +56,11 @@ const Timeline = {
         btn.classList.add("active");
         this.speed = parseInt(btn.dataset.speed);
 
+        // Update leaderboard animation speed
+        if (window.Leaderboard) {
+          Leaderboard.setAnimationSpeed(this.speed);
+        }
+
         // Restart interval if playing
         if (this.isPlaying) {
           this.stopPlay();
@@ -64,8 +69,50 @@ const Timeline = {
       });
     });
 
+    // Keyboard navigation
+    document.addEventListener("keydown", (e) => this.handleKeydown(e));
+
     // Initial render
     this.updateTimeDisplay();
+  },
+
+  /**
+   * Handle keyboard navigation
+   */
+  handleKeydown(e) {
+    // Ignore if user is typing in an input
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") {
+      return;
+    }
+
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      this.goToPrevious();
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      this.goToNext();
+    } else if (e.key === " ") {
+      e.preventDefault();
+      this.togglePlay();
+    }
+  },
+
+  /**
+   * Go to previous snapshot
+   */
+  goToPrevious() {
+    if (this.currentIndex > 0) {
+      this.goToIndex(this.currentIndex - 1);
+    }
+  },
+
+  /**
+   * Go to next snapshot
+   */
+  goToNext() {
+    if (this.currentIndex < this.snapshots.length - 1) {
+      this.goToIndex(this.currentIndex + 1);
+    }
   },
 
   /**

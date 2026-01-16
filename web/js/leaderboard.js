@@ -6,6 +6,33 @@ const Leaderboard = {
   container: null,
   currentPlayers: [],
   previousSnapshot: null,
+  animationSpeed: 1, // Timeline speed (1, 2, or 5)
+
+  /**
+   * Get animation durations based on timeline speed
+   */
+  getAnimationDurations() {
+    // Slower on 1x, faster on 5x
+    const durations = {
+      1: { slide: 0.6, flash: 1500 },
+      2: { slide: 0.4, flash: 1000 },
+      5: { slide: 0.15, flash: 350 },
+    };
+    return durations[this.animationSpeed] || durations[1];
+  },
+
+  /**
+   * Set the animation speed (called by Timeline)
+   */
+  setAnimationSpeed(speed) {
+    this.animationSpeed = speed;
+    // Update CSS custom property for flash animation duration
+    const { flash } = this.getAnimationDurations();
+    document.documentElement.style.setProperty(
+      "--flash-duration",
+      `${flash}ms`
+    );
+  },
 
   /**
    * Initialize the leaderboard
@@ -27,7 +54,8 @@ const Leaderboard = {
     const prevRanks = {};
     if (previousSnapshot) {
       for (const player of previousSnapshot.players) {
-        prevRanks[player.name] = player.rank;
+        const playerId = Stats.getPlayerId(player);
+        prevRanks[playerId] = player.rank;
       }
     }
 
@@ -49,7 +77,8 @@ const Leaderboard = {
     this.container.innerHTML = "";
 
     for (const player of players) {
-      const row = this.createRow(player, prevRanks[player.name]);
+      const playerId = Stats.getPlayerId(player);
+      const row = this.createRow(player, prevRanks[playerId]);
       this.container.appendChild(row);
     }
   },
@@ -61,81 +90,73 @@ const Leaderboard = {
     // Create a map of new positions
     const newPositions = {};
     for (let i = 0; i < newPlayers.length; i++) {
-      newPositions[newPlayers[i].name] = i;
+      const playerId = Stats.getPlayerId(newPlayers[i]);
+      newPositions[playerId] = i;
     }
 
     // Create a map of old positions
     const oldPositions = {};
     for (let i = 0; i < this.currentPlayers.length; i++) {
-      oldPositions[this.currentPlayers[i].name] = i;
+      const playerId = Stats.getPlayerId(this.currentPlayers[i]);
+      oldPositions[playerId] = i;
     }
 
-    // Update existing rows and add new ones
-    const existingRows = {};
-    for (const row of this.container.children) {
-      const name = row.dataset.playerName;
-      existingRows[name] = row;
-    }
-
-    // First pass: update positions and content of existing rows
-    for (const player of newPlayers) {
-      const existingRow = existingRows[player.name];
-      const newPosition = newPositions[player.name];
-      const oldPosition = oldPositions[player.name];
-
-      if (existingRow) {
-        // Update content
-        this.updateRowContent(existingRow, player, prevRanks[player.name]);
-
-        // Animate position change
-        if (oldPosition !== undefined && oldPosition !== newPosition) {
-          const rowHeight = 40; // var(--row-height)
-          const deltaY = (oldPosition - newPosition) * rowHeight;
-
-          // Start from old position
-          existingRow.style.transform = `translateY(${deltaY}px)`;
-          existingRow.style.transition = "none";
-
-          // Force reflow
-          existingRow.offsetHeight;
-
-          // Animate to new position
-          existingRow.style.transition = "transform 0.3s ease-out";
-          existingRow.style.transform = "translateY(0)";
-
-          // Add flash animation
-          if (newPosition < oldPosition) {
-            existingRow.classList.add("animate-up");
-          } else {
-            existingRow.classList.add("animate-down");
-          }
-
-          // Remove animation class after it completes
-          setTimeout(() => {
-            existingRow.classList.remove("animate-up", "animate-down");
-          }, 500);
-        }
-      }
-    }
-
-    // Rebuild the DOM in the correct order
+    // Build new DOM
     const fragment = document.createDocumentFragment();
+    const rowsToAnimate = [];
 
     for (const player of newPlayers) {
-      let row = existingRows[player.name];
+      const playerId = Stats.getPlayerId(player);
+      const row = this.createRow(player, prevRanks[playerId]);
+      const newPosition = newPositions[playerId];
+      const oldPosition = oldPositions[playerId];
 
-      if (!row) {
-        // Create new row for new players
-        row = this.createRow(player, prevRanks[player.name]);
-        row.classList.add("animate-up");
-        setTimeout(() => row.classList.remove("animate-up"), 500);
+      // Track rows that need animation
+      if (oldPosition !== undefined && oldPosition !== newPosition) {
+        const rowHeight = 40; // var(--row-height)
+        const deltaY = (oldPosition - newPosition) * rowHeight;
+        rowsToAnimate.push({ row, deltaY, movedUp: newPosition < oldPosition });
+      } else if (oldPosition === undefined) {
+        // New player entering the leaderboard
+        rowsToAnimate.push({ row, deltaY: 0, isNew: true });
       }
 
       fragment.appendChild(row);
     }
 
+    // Replace DOM
     this.container.innerHTML = "";
     this.container.appendChild(fragment);
+
+    // Get speed-based durations
+    const { slide, flash } = this.getAnimationDurations();
+
+    // Animate after DOM is in place (use requestAnimationFrame for proper timing)
+    requestAnimationFrame(() => {
+      for (const { row, deltaY, movedUp, isNew } of rowsToAnimate) {
+        if (isNew) {
+          row.classList.add("animate-up");
+          setTimeout(() => row.classList.remove("animate-up"), flash);
+        } else {
+          // Set initial position (where it came from)
+          row.style.transform = `translateY(${deltaY}px)`;
+          row.style.transition = "none";
+
+          // Force reflow
+          row.offsetHeight;
+
+          // Animate to final position
+          row.style.transition = `transform ${slide}s cubic-bezier(0.4, 0, 0.2, 1)`;
+          row.style.transform = "translateY(0)";
+
+          // Add flash animation
+          row.classList.add(movedUp ? "animate-up" : "animate-down");
+          setTimeout(() => {
+            row.classList.remove("animate-up", "animate-down");
+          }, flash);
+        }
+      }
+    });
   },
 
   /**
