@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dota 2 Leaderboard Time Machine</title>
-  <meta name="description" content="Track Dota 2 Europe leaderboard changes over time with animated visualizations">
+  <meta name="description" content="Track Dota 2 Europe leaderboard changes over time">
   <link rel="stylesheet" href="css/styles.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -12,7 +12,7 @@
   <div class="app">
     <!-- Header -->
     <header class="header" id="app-header">
-      <h1>🏆 Dota 2 Leaderboard Time Machine</h1>
+      <h1>Dota 2 Leaderboard Time Machine</h1>
       <p class="subtitle">Europe Region</p>
     </header>
 
@@ -36,11 +36,10 @@
             <span>📈 Biggest Winners</span>
             <div class="scope-selects">
               <select id="time-scope" class="scope-select">
-                <option value="1">Today</option>
+                <option value="1">24 Hours</option>
                 <option value="7">Last Week</option>
                 <option value="30">Last Month</option>
                 <option value="180">Last 6 Months</option>
-                <option value="0">Forever</option>
               </select>
               <select id="winners-scope" class="scope-select">
                 <option value="10">Top 10</option>
@@ -59,11 +58,10 @@
             <span>📉 Biggest Losers</span>
             <div class="scope-selects">
               <select id="time-scope-losers" class="scope-select">
-                <option value="1">Today</option>
+                <option value="1">24 Hours</option>
                 <option value="7">Last Week</option>
                 <option value="30">Last Month</option>
                 <option value="180">Last 6 Months</option>
-                <option value="0">Forever</option>
               </select>
               <select id="losers-scope" class="scope-select">
                 <option value="10">Top 10</option>

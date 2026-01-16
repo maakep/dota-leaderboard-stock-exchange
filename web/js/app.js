@@ -21,7 +21,7 @@ const App = {
       // Load saved scope preferences
       const savedWinnersScope = localStorage.getItem("winnersScope") || "20";
       const savedLosersScope = localStorage.getItem("losersScope") || "20";
-      const savedTimeScope = localStorage.getItem("timeScope") || "0";
+      const savedTimeScope = localStorage.getItem("timeScope") || "1";
 
       // Set dropdown values from saved preferences
       document.getElementById("winners-scope").value = savedWinnersScope;
@@ -204,13 +204,17 @@ const App = {
     });
 
     winnersSelect.addEventListener("change", () => {
+      losersSelect.value = winnersSelect.value; // Sync losers dropdown
       const scopes = getScopes();
       localStorage.setItem("winnersScope", winnersSelect.value);
+      localStorage.setItem("losersScope", winnersSelect.value);
       this.renderStats(scopes.winners, scopes.losers, scopes.time);
     });
 
     losersSelect.addEventListener("change", () => {
+      winnersSelect.value = losersSelect.value; // Sync winners dropdown
       const scopes = getScopes();
+      localStorage.setItem("winnersScope", losersSelect.value);
       localStorage.setItem("losersScope", losersSelect.value);
       this.renderStats(scopes.winners, scopes.losers, scopes.time);
     });
