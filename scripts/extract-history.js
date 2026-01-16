@@ -11,8 +11,8 @@ const path = require("path");
 
 // Configuration
 const CONFIG = {
-  MAX_DAYS: 7, // How many days of history to include
-  MAX_SNAPSHOTS: 168, // Maximum snapshots (7 days * 24 hours)
+  MAX_DAYS: 140, // How many days of history to include
+  MAX_SNAPSHOTS: 3360, // Maximum snapshots (140 days * 24 hours)
   LEADERBOARD_FILE: "leaderboard/europe.json",
   OUTPUT_PATH: "web/data/history.json",
 };
