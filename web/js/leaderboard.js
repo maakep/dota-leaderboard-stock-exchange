@@ -128,13 +128,18 @@ const Leaderboard = {
    * Full render (no animation)
    */
   renderFull(players, prevRanks) {
-    this.container.innerHTML = "";
+    // Build new DOM in a fragment first
+    const fragment = document.createDocumentFragment();
 
     for (const player of players) {
       const playerId = Stats.getPlayerId(player);
       const row = this.createRow(player, prevRanks[playerId]);
-      this.container.appendChild(row);
+      fragment.appendChild(row);
     }
+
+    // Replace content atomically
+    this.container.innerHTML = "";
+    this.container.appendChild(fragment);
   },
 
   /**

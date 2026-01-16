@@ -64,18 +64,16 @@ const App = {
       throw new Error("No snapshots in data");
     }
 
-    // Filter out old snapshots that have more than 500 players (old format)
+    // Filter out empty snapshots (extraction script now crops to 500)
     this.data.snapshots = this.data.snapshots.filter(
-      (snapshot) => snapshot.players.length <= 500
+      (snapshot) => snapshot.players.length > 0
     );
 
     if (this.data.snapshots.length === 0) {
       throw new Error("No valid snapshots after filtering");
     }
 
-    console.log(
-      `Loaded ${this.data.snapshots.length} snapshots (filtered to 500-player format)`
-    );
+    console.log(`Loaded ${this.data.snapshots.length} snapshots`);
     console.log(
       `Date range: ${this.data.snapshots[0].timestamp} to ${
         this.data.snapshots[this.data.snapshots.length - 1].timestamp

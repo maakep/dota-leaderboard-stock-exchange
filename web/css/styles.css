@@ -736,7 +736,7 @@ body {
 
   .leaderboard-section {
     flex: none;
-    max-height: 60vh;
+    max-height: 90vh;
   }
 
   .leaderboard-header {

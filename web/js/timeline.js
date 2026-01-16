@@ -155,18 +155,32 @@ const Timeline = {
     this.playBtn.textContent = "⏸";
     this.playBtn.classList.add("playing");
 
+    const intervalMs = 1000 / this.speed;
+
     // If at the end, start from beginning
     if (this.currentIndex >= this.snapshots.length - 1) {
       this.currentIndex = 0;
       this.slider.value = 0;
       this.updateTimeDisplay();
       if (this.onSnapshotChange) {
+        // Pass null as previous - all players are "new" at the start
         this.onSnapshotChange(this.snapshots[0], null);
       }
+      // Delay the interval start to let the initial render complete
+      setTimeout(() => {
+        if (this.isPlaying) {
+          this.startInterval(intervalMs);
+        }
+      }, intervalMs);
+    } else {
+      this.startInterval(intervalMs);
     }
+  },
 
-    const intervalMs = 1000 / this.speed;
-
+  /**
+   * Start the playback interval
+   */
+  startInterval(intervalMs) {
     this.playInterval = setInterval(() => {
       if (this.currentIndex < this.snapshots.length - 1) {
         const previousIndex = this.currentIndex;

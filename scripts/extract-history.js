@@ -81,7 +81,19 @@ function getLeaderboardAtCommit(commitHash) {
   if (!content) return null;
 
   try {
-    const players = JSON.parse(content);
+    let players = JSON.parse(content);
+
+    // Skip empty snapshots
+    if (!players || players.length === 0) {
+      console.log(`  Skipping empty snapshot at ${commitHash}`);
+      return null;
+    }
+
+    // Crop to top 500 players (old format had 5000+)
+    if (players.length > 500) {
+      players = players.slice(0, 500);
+    }
+
     // Only keep necessary fields to reduce file size
     return players.map((p) => ({
       id: `${p.name}|${p.team_id || ""}|${p.country || ""}`,
