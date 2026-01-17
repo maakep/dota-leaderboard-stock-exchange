@@ -833,6 +833,64 @@ body {
   height: 300px;
 }
 
+/* Team History in Modal */
+.modal-team-history {
+  margin-top: 20px;
+  background: var(--bg-tertiary);
+  border-radius: 10px;
+  padding: 15px 20px;
+}
+
+.modal-team-history h3 {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.team-history-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.team-history-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.team-history-item.current {
+  border-left: 3px solid var(--accent);
+}
+
+.team-history-item .team-date {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  min-width: 90px;
+}
+
+.team-history-item .team-name {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.team-history-item .no-team {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.team-history-item .current-label {
+  color: var(--accent);
+  font-size: 0.75rem;
+  margin-left: auto;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

@@ -55,10 +55,9 @@ const Stats = {
           rank: player.rank,
         });
 
-        // Update team info to latest
-        if (player.team_tag) {
-          history[playerId].team_tag = player.team_tag;
-        }
+        // Update to latest values (including null for team if player left)
+        history[playerId].team_tag = player.team_tag || null;
+        history[playerId].team_id = player.team_id || null;
         if (player.country) {
           history[playerId].country = player.country;
         }
@@ -322,6 +321,37 @@ const Stats = {
     changes.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
     return changes;
+  },
+
+  /**
+   * Get full team history for a specific player
+   * @param {Array} snapshots - All snapshots
+   * @param {string} playerId - Player ID to look up
+   * @returns {Array} Array of team states with timestamps
+   */
+  getPlayerTeamHistory(snapshots, playerId) {
+    const teamHistory = [];
+    let currentTeam = undefined; // Track current team to detect changes
+
+    for (const snapshot of snapshots) {
+      const player = snapshot.players.find(
+        (p) => this.getPlayerId(p) === playerId
+      );
+      if (!player) continue;
+
+      const teamTag = player.team_tag || null;
+
+      // Only record when team changes (or first appearance)
+      if (teamTag !== currentTeam) {
+        teamHistory.push({
+          team: teamTag,
+          timestamp: snapshot.timestamp,
+        });
+        currentTeam = teamTag;
+      }
+    }
+
+    return teamHistory;
   },
 };
 // Export for use in other modules

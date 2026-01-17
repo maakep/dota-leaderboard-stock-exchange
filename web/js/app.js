@@ -155,7 +155,7 @@ const App = {
       });
 
       // Re-initialize player modal with new history
-      PlayerModal.init(this.playerHistory);
+      PlayerModal.init(this.playerHistory, this.data.snapshots);
 
       // Re-render everything
       const winnersScope = parseInt(
@@ -239,7 +239,7 @@ const App = {
     });
 
     // Initialize player modal
-    PlayerModal.init(this.playerHistory);
+    PlayerModal.init(this.playerHistory, this.data.snapshots);
   },
 
   /**

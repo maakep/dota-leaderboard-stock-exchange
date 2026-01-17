@@ -6,12 +6,14 @@ const PlayerModal = {
   modal: null,
   chart: null,
   playerHistory: null,
+  snapshots: null,
 
   /**
    * Initialize the modal
    */
-  init(playerHistory) {
+  init(playerHistory, snapshots) {
     this.playerHistory = playerHistory;
+    this.snapshots = snapshots;
     this.modal = document.getElementById("player-modal");
 
     // Close button
@@ -94,9 +96,69 @@ const PlayerModal = {
     // Render chart
     this.renderChart(stats);
 
+    // Render team history
+    this.renderTeamHistory(playerId);
+
     // Show modal
     this.modal.classList.remove("hidden");
     document.body.style.overflow = "hidden";
+  },
+
+  /**
+   * Render team history section
+   */
+  renderTeamHistory(playerId) {
+    const container = document.getElementById("modal-team-history");
+    const list = document.getElementById("modal-team-history-list");
+
+    if (!this.snapshots) {
+      container.classList.add("hidden");
+      return;
+    }
+
+    const teamHistory = Stats.getPlayerTeamHistory(this.snapshots, playerId);
+
+    // Only show if there's been at least one team change (more than 1 entry)
+    if (teamHistory.length <= 1) {
+      container.classList.add("hidden");
+      return;
+    }
+
+    container.classList.remove("hidden");
+
+    // Render list in reverse chronological order (most recent first)
+    list.innerHTML = teamHistory
+      .slice()
+      .reverse()
+      .map((entry, index, arr) => {
+        const date = new Date(entry.timestamp);
+        const dateStr = date.toLocaleDateString("en-GB", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        });
+        const teamName = entry.team
+          ? `<span class="team-name">${this.escapeHtml(entry.team)}</span>`
+          : `<span class="no-team">No Team</span>`;
+
+        // Show arrow for changes (not for the most recent/first entry)
+        const isFirst = index === 0;
+        const prevEntry = arr[index - 1];
+
+        if (isFirst) {
+          return `<li class="team-history-item current">
+            <span class="team-date">${dateStr}</span>
+            ${teamName}
+            <span class="current-label">(current)</span>
+          </li>`;
+        }
+
+        return `<li class="team-history-item">
+          <span class="team-date">${dateStr}</span>
+          ${teamName}
+        </li>`;
+      })
+      .join("");
   },
 
   /**
