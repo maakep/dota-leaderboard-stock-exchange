@@ -182,8 +182,12 @@ const Timeline = {
       if (!isVisible) {
         // Scroll with offset to keep header visible
         const headerOffset = 80;
-        const elementPosition = leaderboard.getBoundingClientRect().top + window.scrollY;
-        window.scrollTo({ top: elementPosition - headerOffset, behavior: "smooth" });
+        const elementPosition =
+          leaderboard.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({
+          top: elementPosition - headerOffset,
+          behavior: "smooth",
+        });
       }
     }
 
